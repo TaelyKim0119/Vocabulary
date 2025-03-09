@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영어 문장 암기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .header-bg {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%),
+                        url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400"%3E%3Cstyle%3E.text%7Bfont-family:Arial;font-size:20px;fill:%23fff;%7D%3C/style%3E%3Ctext x="50" y="50" class="text"%3ETouch%3C/text%3E%3Ctext x="200" y="100" class="text"%3Eto order%3C/text%3E%3C/svg%3E');
+            background-size: cover;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .sentence-translation {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .sentence-translation.show {
+            max-height: 100px;
+        }
+        .custom-checkbox {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #10B981;
+            border-radius: 6px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox:checked {
+            background-color: #10B981;
+        }
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .page-button {
+            transition: transform 0.2s ease;
+        }
+        .page-button:hover {
+            transform: scale(1.05);
+        }
+        .sentence-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sentence-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .progress-container {
+            position: relative;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, #ffffff 100%);
+            border-radius: 1rem;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            animation: shine 1.5s infinite;
+        }
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8">
+    <div class="max-w-5xl mx-auto px-4">
+        <!-- Header -->
+        <div class="header-bg rounded-2xl shadow-lg p-8 mb-8 relative">
+            <div class="relative z-10">
+                <h1 class="text-4xl font-bold text-center text-white mb-6">English Sentence Memorization</h1>
+                <div class="text-center text-white text-xl mb-6">
+                    <span id="memorized-count" class="font-bold text-2xl">0</span> out of 100 sentences memorized
+                </div>
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div id="progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="text-center text-white text-sm mt-2 opacity-75">
+                    <span id="progress-percentage">0</span>% Complete
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="flex flex-wrap gap-4 mb-8 justify-center">
+            <button onclick="saveProgress()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-emerald-500/50">
+                <span class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                    </svg>
+                    Save Progress
+                </span>
+            </button>
+            <button onclick="filterMemorized()" class="bg-violet-500 hover:bg-violet-600 text-white px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-violet-500/50">
+                <span class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Memorized
+                </span>
+            </button>
+            <button onclick="filterNotMemorized()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-amber-500/50">
+                <span class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Not Memorized
+                </span>
+            </button>
+            <button onclick="showAll()" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/50">
+                <span class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    Show All
+                </span>
+            </button>
+        </div>
+
+        <!-- 문장 목록 -->
+        <div id="sentences" class="grid gap-4">
+            <!-- 문장들이 여기에 자바스크립트로 추가됩니다 -->
+        </div>
+    </div>
+
+    <script>
+        const sentences = [
+            {
+                eng: "I agree that the Internet is the best way to obtain information.",
+                kor: "인터넷이 정보를 얻는 가장 좋은 방법이라는 것에 동의합니다."
+            },
+            {
+                eng: "A wealth of information is available on the Internet.",
+                kor: "인터넷에는 풍부한 정보가 있습니다."
+            },
+            {
+                eng: "I can see news articles, photos, and videos that were uploaded from various parts of the world.",
+                kor: "전 세계 여러 곳에서 업로드된 뉴스 기사, 사진, 동영상을 볼 수 있습니다."
+            },
+            {
+                eng: "The information on the Internet is accessible anytime, anywhere.",
+                kor: "인터넷의 정보는 언제 어디서나 접근할 수 있습니다."
+            },
+            {
+                eng: "Even if I have a question late at night or early in the morning, I can find the answer online.",
+                kor: "늦은 밤이나 이른 아침에 질문이 있어도 온라인에서 답을 찾을 수 있습니다."
+            },
+            {
+                eng: "I disagree with the statement that people nowadays are better at communicating than those in the past.",
+                kor: "요즘 사람들이 과거의 사람들보다 의사소통을 더 잘한다는 말에 동의하지 않습니다."
+            },
+            {
+                eng: "There are fewer opportunities to communicate with other people than there were in the past.",
+                kor: "과거에 비해 다른 사람들과 소통할 기회가 더 적어졌습니다."
+            },
+            {
+                eng: "We don't interact with our neighbors or relatives as much, and a lot of people don't even know who their neighbors are.",
+                kor: "우리는 이웃이나 친척들과 많이 교류하지 않으며, 많은 사람들은 자신의 이웃이 누구인지도 모릅니다."
+            },
+            {
+                eng: "People's ability to speak in public has decreased.",
+                kor: "사람들의 대중 연설 능력이 감소했습니다."
+            },
+            {
+                eng: "With the advent of social networking services, many people communicate online.",
+                kor: "소셜 네트워킹 서비스의 등장으로 많은 사람들이 온라인으로 소통합니다."
+            },
+            {
+                eng: "I disagree that electronic media will make printed media obsolete in the future.",
+                kor: "전자 매체가 미래에 인쇄 매체를 쓸모없게 만들 것이라는 의견에 동의하지 않습니다."
+            },
+            {
+                eng: "Printed materials are less tiring to the eyes.",
+                kor: "인쇄물은 눈의 피로가 덜합니다."
+            },
+            {
+                eng: "There are no harmful electromagnetic waves coming from the screen of an electronic device.",
+                kor: "전자기기 화면에서 나오는 유해한 전자파가 없습니다."
+            },
+            {
+                eng: "People still prefer the printed form of publications like newspapers to their online versions.",
+                kor: "사람들은 여전히 신문과 같은 출판물의 온라인 버전보다 인쇄된 형태를 선호합니다."
+            },
+            {
+                eng: "Many people like the feeling of flipping through paper pages as they go through the book.",
+                kor: "많은 사람들이 책을 읽으면서 종이 페이지를 넘기는 느낌을 좋아합니다."
+            },
+            {
+                eng: "I agree that a healthy life is worth more than a materialistically wealthy life.",
+                kor: "건강한 삶이 물질적으로 풍요로운 삶보다 더 가치 있다는 것에 동의합니다."
+            },
+            {
+                eng: "Once you lose your health, it's hard to get it back.",
+                kor: "건강을 한번 잃으면 되찾기 어렵습니다."
+            },
+            {
+                eng: "You can make money if you lose it or get it stolen, but it's not like that with health.",
+                kor: "돈은 잃거나 도난당해도 다시 벌 수 있지만, 건강은 그렇지 않습니다."
+            },
+            {
+                eng: "If you're healthy, you can participate in many more activities.",
+                kor: "건강하다면 더 많은 활동에 참여할 수 있습니다."
+            },
+            {
+                eng: "Traveling or doing exercise requires physical strength, so it's not easy for unhealthy people to do it.",
+                kor: "여행이나 운동은 체력이 필요하므로 건강하지 않은 사람들에게는 쉽지 않습니다."
+            },
+            {
+                eng: "I agree that the computer is the invention that contributes most to our society.",
+                kor: "컴퓨터가 우리 사회에 가장 많은 기여를 한 발명품이라는 것에 동의합니다."
+            },
+            {
+                eng: "Computers made it possible to invent other electronic devices.",
+                kor: "컴퓨터는 다른 전자기기들을 발명할 수 있게 만들었습니다."
+            },
+            {
+                eng: "Everyday devices such as smartphones wouldn't have been created if it wasn't for computers.",
+                kor: "컴퓨터가 없었다면 스마트폰과 같은 일상적인 기기들은 만들어지지 않았을 것입니다."
+            },
+            {
+                eng: "Our society itself functions based on computer technology.",
+                kor: "우리 사회 자체가 컴퓨터 기술을 기반으로 작동합니다."
+            },
+            {
+                eng: "Computers are used everywhere including at home, at school, and in the workplace.",
+                kor: "컴퓨터는 가정, 학교, 직장을 포함한 모든 곳에서 사용됩니다."
+            },
+            {
+                eng: "I disagree that buying products in bulk help save money.",
+                kor: "대량 구매가 돈을 절약하는 데 도움이 된다는 것에 동의하지 않습니다."
+            },
+            {
+                eng: "It encourages impulse buying.",
+                kor: "이는 충동구매를 조장합니다."
+            },
+            {
+                eng: "Bulk items seem cheap considering the amount that you get, so you'll likely buy more than you need.",
+                kor: "대량 구매 상품은 양을 고려하면 저렴해 보여서 필요 이상으로 구매하게 될 것입니다."
+            },
+            {
+                eng: "It is a big waste if you don't consume everything you buy.",
+                kor: "구매한 모든 것을 소비하지 않으면 큰 낭비입니다."
+            },
+            {
+                eng: "I live alone, so if I bought things in bulk, I probably couldn't use it all and it would be wasted.",
+                kor: "혼자 살기 때문에 물건을 대량으로 구매하면 다 사용하지 못하고 낭비될 것입니다."
+            },
+            {
+                eng: "I agree that people these days have an easier time relieving their stress than people did in the past.",
+                kor: "요즘 사람들이 과거 사람들보다 스트레스 해소가 더 쉽다는 것에 동의합니다."
+            },
+            {
+                eng: "There are more ways to readily relieve stress.",
+                kor: "스트레스를 쉽게 해소할 수 있는 방법이 더 많습니다."
+            },
+            {
+                eng: "People can easily lift their spirits through exercising or other hobbies.",
+                kor: "사람들은 운동이나 다른 취미를 통해 쉽게 기분을 전환할 수 있습니다."
+            },
+            {
+                eng: "People can get away and enjoy a change of scenery anytime they want.",
+                kor: "사람들은 원할 때 언제든 떠나서 새로운 환경을 즐길 수 있습니다."
+            },
+            {
+                eng: "You can take day trips on a whim because transportation has developed significantly.",
+                kor: "교통이 크게 발달했기 때문에 즉흥적으로 당일 여행을 갈 수 있습니다."
+            },
+            {
+                eng: "I disagree that most buildings will be solar-powered in the near future.",
+                kor: "가까운 미래에 대부분의 건물이 태양광 발전을 사용할 것이라는 의견에 동의하지 않습니다."
+            },
+            {
+                eng: "Installing solar panels costs a lot.",
+                kor: "태양광 패널 설치는 비용이 많이 듭니다."
+            },
+            {
+                eng: "The installation fees are expensive and you also have to pay for a regular maintenance fee.",
+                kor: "설치 비용이 비싸고 정기적인 유지보수 비용도 지불해야 합니다."
+            },
+            {
+                eng: "A lot of newly constructed buildings do not allow for the installation of solar panels.",
+                kor: "많은 신축 건물들이 태양광 패널 설치를 허용하지 않습니다."
+            },
+            {
+                eng: "Installing solar panels requires a large open place, but recently built buildings have small rooftops.",
+                kor: "태양광 패널 설치는 넓은 공간이 필요하지만, 최근 건물들은 옥상이 작습니다."
+            },
+            {
+                eng: "I believe that having a happy family is the most important factor that contributes to a successful life.",
+                kor: "행복한 가정을 갖는 것이 성공적인 삶에 가장 중요한 요소라고 믿습니다."
+            },
+            {
+                eng: "I will be confident in everything I do.",
+                kor: "내가 하는 모든 일에 자신감을 가질 것입니다."
+            },
+            {
+                eng: "Having a happy family means that I have real supporters.",
+                kor: "행복한 가정을 갖는다는 것은 진정한 지지자들이 있다는 것을 의미합니다."
+            },
+            {
+                eng: "I can focus on work better.",
+                kor: "일에 더 잘 집중할 수 있습니다."
+            },
+            {
+                eng: "There is no such thing as family trouble, so there are fewer points of concern.",
+                kor: "가정 문제가 없으므로 걱정거리가 더 적습니다."
+            },
+            {
+                eng: "I prefer to plan my own travel than to use a travel agency.",
+                kor: "여행사를 이용하는 것보다 직접 여행을 계획하는 것을 선호합니다."
+            },
+            {
+                eng: "I can customize my trip just the way I want to.",
+                kor: "내가 원하는 대로 여행을 맞춤 설정할 수 있습니다."
+            },
+            {
+                eng: "I can see what I want to see, and eat what I want to eat.",
+                kor: "보고 싶은 것을 보고, 먹고 싶은 것을 먹을 수 있습니다."
+            },
+            {
+                eng: "I can have more flexibility in my schedule.",
+                kor: "일정을 더 유연하게 조정할 수 있습니다."
+            },
+            {
+                eng: "If I have a change of heart, or find something else more interesting, I can rearrange my schedule.",
+                kor: "마음이 바뀌거나 더 흥미로운 것을 발견하면 일정을 재조정할 수 있습니다."
+            },
+            {
+                eng: "I consider the amount of time required to do the hobby the most when I'm choosing a new hobby.",
+                kor: "새로운 취미를 선택할 때 그 취미에 필요한 시간을 가장 많이 고려합니다."
+            },
+            {
+                eng: "I don't have a lot of time to spare.",
+                kor: "여유 시간이 많지 않습니다."
+            },
+            {
+                eng: "I have to spend most of my time on my studies for school and other certificates so I can get a job.",
+                kor: "취직을 위해 학교 공부와 다른 자격증 공부에 대부분의 시간을 써야 합니다."
+            },
+            {
+                eng: "The hobby shouldn't be too time-consuming if I want to keep it for a long time.",
+                kor: "오랫동안 취미를 유지하고 싶다면 너무 시간이 많이 소요되지 않아야 합니다."
+            },
+            {
+                eng: "If I had to set aside a lot of time for my hobby, I'd become stressed out and not do it.",
+                kor: "취미를 위해 많은 시간을 할애해야 한다면, 스트레스를 받고 하지 않게 될 것입니다."
+            },
+            {
+                eng: "I think the medical field will see the greatest changes in the next 20 years.",
+                kor: "향후 20년간 의료 분야가 가장 큰 변화를 겪을 것이라고 생각합니다."
+            },
+            {
+                eng: "New methods of diagnosing patients using various electronic devices will become available.",
+                kor: "다양한 전자기기를 사용한 새로운 환자 진단 방법이 가능해질 것입니다."
+            },
+            {
+                eng: "There are already devices that check heartbeat and brain waves, and these devices will only improve.",
+                kor: "이미 심장박동과 뇌파를 체크하는 기기들이 있으며, 이러한 기기들은 계속 발전할 것입니다."
+            },
+            {
+                eng: "Many people have a desire for a long, healthy life.",
+                kor: "많은 사람들이 길고 건강한 삶을 원합니다."
+            },
+            {
+                eng: "New cures and medicines for currently incurable diseases will continue to be developed.",
+                kor: "현재 치료 불가능한 질병에 대한 새로운 치료법과 약이 계속해서 개발될 것입니다."
+            },
+            {
+                eng: "I prefer team sports to individual sports.",
+                kor: "개인 운동보다 단체 운동을 선호합니다."
+            },
+            {
+                eng: "Team sports teach me how to cooperate with other people.",
+                kor: "단체 운동은 다른 사람들과 협력하는 방법을 가르쳐줍니다."
+            },
+            {
+                eng: "They require working with every team member to achieve a shared goal.",
+                kor: "공동의 목표를 달성하기 위해 모든 팀원과 협력해야 합니다."
+            },
+            {
+                eng: "I can make new friends.",
+                kor: "새로운 친구를 사귈 수 있습니다."
+            },
+            {
+                eng: "Interacting and working out with each other naturally fosters friendships.",
+                kor: "서로 교류하고 운동하면서 자연스럽게 우정이 형성됩니다."
+            },
+            {
+                eng: "I prefer to go to a concert rather than listen to a recorded music.",
+                kor: "녹음된 음악을 듣는 것보다 콘서트에 가는 것을 선호합니다."
+            },
+            {
+                eng: "I can see my favorite singers in person, and listen to their songs live.",
+                kor: "좋아하는 가수를 직접 보고, 그들의 노래를 라이브로 들을 수 있습니다."
+            },
+            {
+                eng: "It's a special experience to be in the same space as my favorite singer.",
+                kor: "좋아하는 가수와 같은 공간에 있는 것은 특별한 경험입니다."
+            },
+            {
+                eng: "It's a chance to connect with others who share the same passion as me.",
+                kor: "나와 같은 열정을 공유하는 다른 사람들과 교감할 수 있는 기회입니다."
+            },
+            {
+                eng: "I feel togetherness with other members of the audience who are singing and dancing along the music.",
+                kor: "음악에 맞춰 노래하고 춤추는 다른 관객들과 함께하는 느낌을 받습니다."
+            },
+            {
+                eng: "Pursuing new things and enjoying adventures can expand my horizons.",
+                kor: "새로운 것을 추구하고 모험을 즐기는 것은 내 시야를 넓힐 수 있습니다."
+            },
+            {
+                eng: "I can learn new things as I experience diverse environments.",
+                kor: "다양한 환경을 경험하면서 새로운 것들을 배울 수 있습니다."
+            },
+            {
+                eng: "New experiences can make me become more creative.",
+                kor: "새로운 경험들은 나를 더 창의적으로 만들 수 있습니다."
+            },
+            {
+                eng: "I can come up with new ways to solve problems in unexpected situations.",
+                kor: "예상치 못한 상황에서 문제를 해결하는 새로운 방법을 생각해낼 수 있습니다."
+            },
+            {
+                eng: "Some people you meet online may lie or act rudely.",
+                kor: "온라인에서 만나는 일부 사람들은 거짓말을 하거나 무례하게 행동할 수 있습니다."
+            },
+            {
+                eng: "People you meet online may act less responsibly, as people in cyberspace are anonymous.",
+                kor: "사이버 공간에서는 익명성이 있기 때문에 온라인에서 만나는 사람들은 덜 책임감 있게 행동할 수 있습니다."
+            },
+            {
+                eng: "It's hard to maintain a friendship because of the contrasts in our environments.",
+                kor: "우리의 환경 차이 때문에 우정을 유지하기가 어렵습니다."
+            },
+            {
+                eng: "Keeping in touch with someone in a different country is tough because of the time differences.",
+                kor: "시차 때문에 다른 나라에 있는 사람과 연락을 유지하기가 어렵습니다."
+            },
+            {
+                eng: "There can be an invasion of privacy when living with roommates.",
+                kor: "룸메이트와 살 때 사생활 침해가 있을 수 있습니다."
+            },
+            {
+                eng: "My roommates might disturb me when I want to be alone.",
+                kor: "혼자 있고 싶을 때 룸메이트가 방해할 수 있습니다."
+            },
+            {
+                eng: "The living quarters will get dirty easily.",
+                kor: "생활 공간이 쉽게 더러워질 수 있습니다."
+            },
+            {
+                eng: "When many people live in a shared space, more trash is created.",
+                kor: "많은 사람이 공유 공간에서 살면 더 많은 쓰레기가 생깁니다."
+            },
+            {
+                eng: "The public does not have a right to know about the private affairs of celebrities.",
+                kor: "대중은 연예인의 사생활을 알 권리가 없습니다."
+            },
+            {
+                eng: "Everyone has a right to their privacy.",
+                kor: "모든 사람은 사생활에 대한 권리가 있습니다."
+            },
+            {
+                eng: "Invasion of privacy can lead to mental stress.",
+                kor: "사생활 침해는 정신적 스트레스를 유발할 수 있습니다."
+            },
+            {
+                eng: "I prefer reading books rather than watching TV during my spare time.",
+                kor: "여가 시간에 TV를 보는 것보다 책 읽기를 선호합니다."
+            },
+            {
+                eng: "Reading books can actively stimulate my imagination.",
+                kor: "책 읽기는 내 상상력을 적극적으로 자극할 수 있습니다."
+            },
+            {
+                eng: "Watching TV is a much more passive experience.",
+                kor: "TV 시청은 훨씬 더 수동적인 경험입니다."
+            },
+            {
+                eng: "When it comes to reading books, there's a huge selection to choose from.",
+                kor: "책 읽기에 관해서는 선택할 수 있는 것이 매우 많습니다."
+            },
+            {
+                eng: "Customer reviews on social media are the most effective way to advertise a product.",
+                kor: "소셜 미디어의 고객 리뷰가 제품을 광고하는 가장 효과적인 방법입니다."
+            },
+            {
+                eng: "Potential customers have more trust in customer reviews than in the advertisements a company provides.",
+                kor: "잠재 고객들은 기업이 제공하는 광고보다 고객 리뷰를 더 신뢰합니다."
+            },
+            {
+                eng: "Information can spread much more quickly through social media.",
+                kor: "정보는 소셜 미디어를 통해 훨씬 더 빠르게 퍼질 수 있습니다."
+            },
+            {
+                eng: "Most people spend hours on social media every day.",
+                kor: "대부분의 사람들이 매일 몇 시간씩 소셜 미디어를 사용합니다."
+            },
+            {
+                eng: "I prefer to stay in the same country when traveling overseas.",
+                kor: "해외여행 시 한 나라에 머무는 것을 선호합니다."
+            },
+            {
+                eng: "It's less complicated to stay in one country.",
+                kor: "한 나라에 머무는 것이 덜 복잡합니다."
+            },
+            {
+                eng: "I don't have to plan many different itineraries.",
+                kor: "여러 가지 다른 일정을 계획할 필요가 없습니다."
+            },
+            {
+                eng: "I'm less likely to get lost or forget my belongings somewhere.",
+                kor: "길을 잃거나 물건을 어딘가에 두고 올 가능성이 적습니다."
+            },
+            {
+                eng: "Blogs are the best means of obtaining information.",
+                kor: "블로그는 정보를 얻는 가장 좋은 수단입니다."
+            },
+            {
+                eng: "Blogs provide both objective and subjective information about products or places.",
+                kor: "블로그는 제품이나 장소에 대한 객관적이고 주관적인 정보를 모두 제공합니다."
+            },
+            {
+                eng: "Blogs let users share opinions with other users.",
+                kor: "블로그는 사용자들이 다른 사용자들과 의견을 공유할 수 있게 합니다."
+            }
+        ];
+
+        let memorizedState = new Array(sentences.length).fill(false);
+        let currentPage = 0;
+        const itemsPerPage = 5;
+
+        function createSentenceElements() {
+            const container = document.getElementById('sentences');
+            container.innerHTML = '';
+            
+            sentences.forEach((sentence, i) => {
+                const div = document.createElement('div');
+                div.className = 'sentence-card bg-white rounded-xl shadow-md p-6 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-1';
+                
+                const content = document.createElement('div');
+                content.className = 'flex items-start gap-4';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `sentence-${i}`;
+                checkbox.className = 'custom-checkbox mt-1';
+                checkbox.checked = memorizedState[i];
+                checkbox.onchange = () => updateProgress(i, checkbox.checked);
+
+                const text = document.createElement('div');
+                text.className = 'flex-1 cursor-pointer';
+                text.onclick = () => toggleTranslation(i);
+                text.innerHTML = `
+                    <p class="text-gray-800 text-lg font-medium">${sentence.eng}</p>
+                    <p class="sentence-translation text-gray-600 mt-2 pl-4 border-l-2 border-emerald-500" id="translation-${i}">
+                        ${sentence.kor}
+                    </p>
+                `;
+
+                content.appendChild(checkbox);
+                content.appendChild(text);
+                div.appendChild(content);
+                container.appendChild(div);
+            });
+        }
+
+        function toggleTranslation(index) {
+            const translation = document.getElementById(`translation-${index}`);
+            translation.classList.toggle('show');
+        }
+
+        function updateProgress(index, checked) {
+            memorizedState[index] = checked;
+            const memorizedCount = memorizedState.filter(state => state).length;
+            const percentage = Math.round((memorizedCount / sentences.length) * 100);
+            
+            document.getElementById('memorized-count').textContent = memorizedCount;
+            document.getElementById('progress').style.width = `${percentage}%`;
+            document.getElementById('progress-percentage').textContent = percentage;
+            
+            // 진행률에 따른 애니메이션 효과
+            const progressBar = document.getElementById('progress');
+            progressBar.style.transition = 'all 0.5s ease';
+        }
+
+        function saveProgress() {
+            localStorage.setItem('memorizedState', JSON.stringify(memorizedState));
+            alert('진행 상황이 저장되었습니다!');
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('memorizedState');
+            if (saved) {
+                memorizedState = JSON.parse(saved);
+                createSentenceElements();
+                updateProgress(0, memorizedState[0]);
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('정말로 모든 진행 상황을 초기화하시겠습니까?')) {
+                memorizedState = new Array(sentences.length).fill(false);
+                createSentenceElements();
+                updateProgress(0, false);
+                localStorage.removeItem('memorizedState');
+            }
+        }
+
+        function filterMemorized() {
+            document.querySelectorAll('#sentences > div').forEach((div, index) => {
+                div.style.display = memorizedState[index] ? 'block' : 'none';
+            });
+        }
+
+        function filterNotMemorized() {
+            document.querySelectorAll('#sentences > div').forEach((div, index) => {
+                div.style.display = memorizedState[index] ? 'none' : 'block';
+            });
+        }
+
+        function showAll() {
+            document.querySelectorAll('#sentences > div').forEach(div => {
+                div.style.display = 'block';
+            });
+        }
+
+        // 페이지 로드 시 실행
+        createSentenceElements();
+        loadProgress();
+    </script>
+</body>
+</html> 
