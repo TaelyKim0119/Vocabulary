@@ -588,6 +588,7 @@
         ];
 
         let memorizedState = new Array(sentences.length).fill(false);
+        let showingKorean = new Array(sentences.length).fill(false);
         let currentPage = 0;
         const itemsPerPage = 5;
 
@@ -611,10 +612,15 @@
 
                 const text = document.createElement('div');
                 text.className = 'flex-1 cursor-pointer text-sm';
-                text.onclick = () => toggleTranslation(i);
+                text.onclick = () => toggleLanguage(i);
+
                 text.innerHTML = `
-                    <p class="text-gray-800 font-medium">${sentence.eng}</p>
-                    <p class="sentence-translation text-gray-600 mt-1 pl-2 border-l-2 border-emerald-500 text-xs" id="translation-${i}">
+                    <p class="text-gray-800 font-medium" id="eng-${i}">
+                        <span class="text-emerald-500 font-bold mr-2">${i + 1}.</span>
+                        ${sentence.eng}
+                    </p>
+                    <p class="hidden text-gray-600 mt-1 pl-2 border-l-2 border-emerald-500 text-sm" id="kor-${i}">
+                        <span class="text-emerald-500 font-bold mr-2">${i + 1}.</span>
                         ${sentence.kor}
                     </p>
                 `;
@@ -626,9 +632,19 @@
             });
         }
 
-        function toggleTranslation(index) {
-            const translation = document.getElementById(`translation-${index}`);
-            translation.classList.toggle('show');
+        function toggleLanguage(index) {
+            const engText = document.getElementById(`eng-${index}`);
+            const korText = document.getElementById(`kor-${index}`);
+            
+            if (showingKorean[index]) {
+                engText.classList.remove('hidden');
+                korText.classList.add('hidden');
+            } else {
+                engText.classList.add('hidden');
+                korText.classList.remove('hidden');
+            }
+            
+            showingKorean[index] = !showingKorean[index];
         }
 
         function updateProgress(index, checked) {
