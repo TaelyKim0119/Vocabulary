@@ -140,6 +140,32 @@
                 transform: translateX(100%);
             }
         }
+        .speak-button {
+            background: none;
+            border: none;
+            color: #10B981;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .speak-button:hover {
+            background-color: #10B98120;
+            transform: scale(1.1);
+        }
+        
+        .speak-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .speak-button svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-4">
@@ -614,6 +640,18 @@
                 text.className = 'flex-1 cursor-pointer text-sm';
                 text.onclick = () => toggleLanguage(i);
 
+                const speakButton = document.createElement('button');
+                speakButton.className = 'speak-button mt-1';
+                speakButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                `;
+                speakButton.onclick = (e) => {
+                    e.stopPropagation();
+                    speak(sentence.eng);
+                };
+
                 text.innerHTML = `
                     <p class="text-gray-800 font-medium" id="eng-${i}">
                         <span class="text-emerald-500 font-bold mr-2">${i + 1}.</span>
@@ -627,6 +665,7 @@
 
                 content.appendChild(checkbox);
                 content.appendChild(text);
+                content.appendChild(speakButton);
                 div.appendChild(content);
                 container.appendChild(div);
             });
@@ -700,6 +739,15 @@
             document.querySelectorAll('#sentences > div').forEach(div => {
                 div.style.display = 'block';
             });
+        }
+
+        // 음성 합성 기능
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9; // 약간 천천히
+            utterance.pitch = 1;
+            window.speechSynthesis.speak(utterance);
         }
 
         // 페이지 로드 시 실행
